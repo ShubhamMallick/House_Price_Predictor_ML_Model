@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Housing Price Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-x" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <i class="fa-solid fa-house-chimney-window hero-icon"></i>
+            <h1>Boston Housing Price Predictor</h1>
+            <p>Estimate home values instantly with a trained ML model.</p>
+        </div>
+    </header>
+    <div class="container">
+        <div class="content-grid">
+        <div class="form-container main-column">
+            <div class="badges">
+                <span class="badge"><i class="fa-solid fa-gauge"></i> Fast</span>
+                <span class="badge"><i class="fa-solid fa-shield"></i> Secure</span>
+                <span class="badge"><i class="fa-solid fa-brain"></i> ML Powered</span>
+            </div>
+            <div id="input-fields">
+                <div class="input-group">
+                    <label for="CRIM">CRIM:</label>
+                    <input type="number" step="any" id="CRIM" placeholder="Per capita crime rate">
+                </div>
+                <div class="input-group">
+                    <label for="ZN">ZN:</label>
+                    <input type="number" step="any" id="ZN" placeholder="Residential land zoned">
+                </div>
+                <div class="input-group">
+                    <label for="INDUS">INDUS:</label>
+                    <input type="number" step="any" id="INDUS" placeholder="Non-retail business acres">
+                </div>
+                <div class="input-group">
+                    <label for="chas">CHAS (Charles River)</label>
+                    <select id="chas" name="chas">
+                        <option value="0">No (0)</option>
+                        <option value="1">Yes (1)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="NOX">NOX:</label>
+                    <input type="number" step="any" id="NOX" placeholder="Nitric oxides concentration">
+                </div>
+                <div class="input-group">
+                    <label for="RM">RM:</label>
+                    <input type="number" step="any" id="RM" placeholder="Avg rooms per dwelling">
+                </div>
+                <div class="input-group">
+                    <label for="AGE">AGE:</label>
+                    <input type="number" step="any" id="AGE" placeholder="Proportion owner-occupied">
+                </div>
+                <div class="input-group">
+                    <label for="DIS">DIS:</label>
+                    <input type="number" step="any" id="DIS" placeholder="Distance to employment centers">
+                </div>
+                <div class="input-group">
+                    <label for="RAD">RAD:</label>
+                    <input type="number" step="any" id="RAD" placeholder="Accessibility to highways">
+                </div>
+                <div class="input-group">
+                    <label for="TAX">TAX:</label>
+                    <input type="number" step="any" id="TAX" placeholder="Property tax rate">
+                </div>
+                <div class="input-group">
+                    <label for="PTRATIO">PTRATIO:</label>
+                    <input type="number" step="any" id="PTRATIO" placeholder="Pupil-teacher ratio">
+                </div>
+                <div class="input-group">
+                    <label for="B">B:</label>
+                    <input type="number" step="any" id="B" placeholder="Proportion of Black residents">
+                </div>
+                <div class="input-group">
+                    <label for="LSTAT">LSTAT:</label>
+                    <input type="number" step="any" id="LSTAT" placeholder="% lower status population">
+                </div>
+            </div>
+            <div class="actions">
+                <button id="predict-btn"><i class="fa-solid fa-magnifying-glass-chart"></i> Predict Price</button>
+                <button id="example-btn" type="button" class="secondary"><i class="fa-solid fa-wand-magic-sparkles"></i> Use Example</button>
+            </div>
+            <div id="loader" class="loader hidden" aria-live="polite" aria-busy="true">
+                <div class="spinner"></div>
+                <span>Calculating prediction...</span>
+            </div>
+            <div id="result" class="hidden">
+                <h2><i class="fa-solid fa-sack-dollar"></i> Predicted Home Value: <span id="prediction-value"></span></h2>
+            </div>
+            <div id="error" class="hidden">
+                <h2 class="error">Error: <span id="error-message"></span></h2>
+            </div>
+        </div>
+        <aside class="side-column">
+            <section class="info-sections">
+                    <div class="info-card">
+                        <h3 class="section-title"><i class="fa-solid fa-circle-info"></i> How to Use</h3>
+                        <ol>
+                            <li>Enter values for each field. Hover labels for hints.</li>
+                            <li>Set <span class="pill">CHAS</span> to <strong>1</strong> if the tract bounds the Charles River, else <strong>0</strong>.</li>
+                            <li>Click <strong>Predict Price</strong> to estimate the median home value.</li>
+                            <li>Or click <strong>Use Example</strong> to auto-fill typical values.</li>
+                        </ol>
+                    </div>
+                    <div class="info-card">
+                        <h3 class="section-title"><i class="fa-solid fa-book-open"></i> Full Forms (Feature Glossary)</h3>
+                        <ul class="glossary">
+                            <li><span class="pill">CRIM</span> Per capita crime rate by town</li>
+                            <li><span class="pill">ZN</span> Proportion of residential land zoned for lots over 25,000 sq.ft.</li>
+                            <li><span class="pill">INDUS</span> Proportion of non-retail business acres per town</li>
+                            <li><span class="pill">CHAS</span> Charles River dummy variable (=1 if tract bounds river; 0 otherwise)</li>
+                            <li><span class="pill">NOX</span> Nitric oxides concentration (parts per 10 million)</li>
+                            <li><span class="pill">RM</span> Average number of rooms per dwelling</li>
+                            <li><span class="pill">AGE</span> Proportion of owner-occupied units built prior to 1940</li>
+                            <li><span class="pill">DIS</span> Weighted distances to five Boston employment centres</li>
+                            <li><span class="pill">RAD</span> Index of accessibility to radial highways</li>
+                            <li><span class="pill">TAX</span> Full-value property-tax rate per $10,000</li>
+                            <li><span class="pill">PTRATIO</span> Pupil–teacher ratio by town</li>
+                            <li><span class="pill">B</span> 1000(Bk − 0.63)^2 where Bk is proportion of Black residents</li>
+                            <li><span class="pill">LSTAT</span> % lower status of the population</li>
+                        </ul>
+                    </div>
+            </section>
+        </aside>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
